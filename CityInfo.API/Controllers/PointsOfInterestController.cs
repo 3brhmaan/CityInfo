@@ -70,4 +70,27 @@ public class PointsOfInterestController : ControllerBase
             } ,
             finalPointOfInterest);
     }
+
+    [HttpPut("{pointOfInterestId}")]
+    public ActionResult UpdatePointOfInterest(int cityId,
+        int pointOfInterestId ,
+        PointOfInterestForUpdateDto pointOfInterest)
+    {
+        var city = CityDataStore.Current.Cities
+            .FirstOrDefault(c => c.Id == cityId);
+
+        if (city is null)
+            return NotFound();
+
+        var pointOfInterestFromStore = city.PointsOfInterest
+            .FirstOrDefault(p => p.Id == pointOfInterestId);
+
+        if (pointOfInterest is null)
+            return NotFound();
+
+        pointOfInterestFromStore.Name = pointOfInterest.Name;
+        pointOfInterestFromStore.Description = pointOfInterest.Description;
+
+        return NoContent();
+    }
 }
