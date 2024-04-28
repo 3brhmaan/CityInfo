@@ -1,5 +1,6 @@
 ﻿using CityInfo.API.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CityInfo.API.Controllers;
@@ -20,7 +21,7 @@ public class PointsOfInterestController : ControllerBase
         return Ok(city.PointsOfInterest);
     }
 
-    [HttpGet("{pointOfInterestId}" , Name = "GetPointOfInterest")]
+    [HttpGet("{pointOfInterestId}", Name = "GetPointOfInterest")]
     public ActionResult<PointOfInterestDto> GetPointOfInterest(int cityId, int pointOfInterestId)
     {
         var city = CityDataStore.Current.Cities
@@ -46,7 +47,7 @@ public class PointsOfInterestController : ControllerBase
         var city = CityDataStore.Current.Cities
             .FirstOrDefault(c => c.Id == cityId);
 
-        if(city is null)
+        if (city is null)
             return NotFound();
 
         var maxPointOfInterestId = city.PointsOfInterest
@@ -62,18 +63,19 @@ public class PointsOfInterestController : ControllerBase
         city.PointsOfInterest.Add(finalPointOfInterest);
 
         return CreatedAtRoute(
-            "GetPointOfInterest" , 
+            "GetPointOfInterest",
             new
             {
-                cityId = cityId ,
+                cityId = cityId,
                 pointOfInterestId = finalPointOfInterest.Id
-            } ,
+            },
             finalPointOfInterest);
     }
 
     [HttpPut("{pointOfInterestId}")]
-    public ActionResult UpdatePointOfInterest(int cityId,
-        int pointOfInterestId ,
+    public ActionResult UpdatePointOfInterest(
+        int cityId,
+        int pointOfInterestId,
         PointOfInterestForUpdateDto pointOfInterest)
     {
         var city = CityDataStore.Current.Cities
@@ -85,7 +87,7 @@ public class PointsOfInterestController : ControllerBase
         var pointOfInterestFromStore = city.PointsOfInterest
             .FirstOrDefault(p => p.Id == pointOfInterestId);
 
-        if (pointOfInterest is null)
+        if (pointOfInterestFromStore is null)
             return NotFound();
 
         pointOfInterestFromStore.Name = pointOfInterest.Name;
@@ -93,4 +95,46 @@ public class PointsOfInterestController : ControllerBase
 
         return NoContent();
     }
+
+    // check what happen when there is something wrong with the data sended 
+    [HttpPatch("{pointOfInterestId}")]
+    public ActionResult PartialUpdatePointOfInterest(
+        int cityId,
+        int pointOfInterestId,
+        JsonPatchDocument<PointOfInterestForUpdateDto> patchDocument)
+    {
+        var city = CityDataStore.Current.Cities
+            .FirstOrDefault(c => c.Id == cityId);
+
+        if (city is null)
+            return NotFound();
+
+        var pointOfInterestFromStore = city.PointsOfInterest
+            .FirstOrDefault(p => p.Id == pointOfInterestId);
+
+        if (pointOfInterestFromStore is null)
+            return NotFound();
+
+        var pointOfInterestToPatch =
+            new PointOfInterestForUpdateDto
+            {
+                Name = pointOfInterestFromStore.Name,
+                Description = pointOfInterestFromStore.Description
+            };
+
+        patchDocument.ApplyTo(pointOfInterestToPatch , ModelState);
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        pointOfInterestFromStore.Name = pointOfInterestToPatch.Name;
+        pointOfInterestFromStore.Description = pointOfInterestToPatch.Description;
+
+        if (!TryValidateModel(pointOfInterestToPatch))
+            return BadRequest(ModelState);
+
+        return NoContent();
+    }
+
 }
+

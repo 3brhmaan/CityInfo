@@ -13,7 +13,9 @@ public class Program
         builder.Services.AddControllers(options =>
         {
             options.ReturnHttpNotAcceptable = true;
-        }).AddXmlDataContractSerializerFormatters();
+        })
+        .AddNewtonsoftJson()
+        .AddXmlDataContractSerializerFormatters();
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
