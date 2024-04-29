@@ -17,6 +17,8 @@ public class Program
         .AddNewtonsoftJson()
         .AddXmlDataContractSerializerFormatters();
 
+        builder.Services.AddProblemDetails();
+
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
@@ -24,6 +26,12 @@ public class Program
         WebApplication app = builder.Build();
 
         // Configure the HTTP request pipeline.
+        
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseExceptionHandler();
+        }
+
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
