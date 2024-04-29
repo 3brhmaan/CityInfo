@@ -33,7 +33,8 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 
-        builder.Services.AddTransient<LocalMailService>();
+        builder.Services.AddTransient<IMailService , LocalMailService>();
+        builder.Services.AddSingleton<CityDataStore>();
 
         WebApplication app = builder.Build();
 

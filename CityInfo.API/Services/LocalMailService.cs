@@ -1,6 +1,7 @@
 ﻿namespace CityInfo.API.Services;
 
-public class LocalMailService
+
+public class LocalMailService : IMailService
 {
     private string _mailTo = "admin@mycompany.com";
     private string _mailFrom = "noreply@mycompany.com";
