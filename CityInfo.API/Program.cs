@@ -1,5 +1,7 @@
+using CityInfo.API.DbContext;
 using CityInfo.API.Services;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 namespace CityInfo.API;
@@ -31,10 +33,16 @@ public class Program
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
-        builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 
+        builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
         builder.Services.AddTransient<IMailService , LocalMailService>();
         builder.Services.AddSingleton<CityDataStore>();
+        builder.Services.AddDbContext<CityInfoContext>(options =>
+        {
+            options.UseSqlServer(
+                builder.Configuration["ConnectionStrings:DefaultConnection"]
+                );
+        });
 
         WebApplication app = builder.Build();
 
