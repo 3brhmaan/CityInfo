@@ -13,16 +13,20 @@ public class CityController : ControllerBase
     private readonly ICityInfoRepository _cityInfoRepository;
     private readonly IMapper _mapper;
 
-    public CityController(ICityInfoRepository cityInfoRepository, IMapper mapper)
+    public CityController(
+        ICityInfoRepository cityInfoRepository, 
+        IMapper mapper)
     {
         _cityInfoRepository = cityInfoRepository;
         _mapper = mapper;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CityWithoutPointsOfInterestDto>>> GetCities()
+    public async Task<ActionResult<IEnumerable<CityWithoutPointsOfInterestDto>>> GetCities(
+        string? name,
+        string? searchQuery)
     {
-        var cityEntities = await _cityInfoRepository.GetCitiesAsync();
+        var cityEntities = await _cityInfoRepository.GetCitiesAsync(name , searchQuery);
 
         var results = _mapper.Map<IEnumerable<CityWithoutPointsOfInterestDto>>(cityEntities);
 
@@ -30,7 +34,9 @@ public class CityController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetCity(int id , bool inculdePointsOfInterest = false)
+    public async Task<IActionResult> GetCity(
+        int id ,
+        bool inculdePointsOfInterest = false)
     {
         var city = await _cityInfoRepository.GetCityAsync(id , inculdePointsOfInterest);
 
