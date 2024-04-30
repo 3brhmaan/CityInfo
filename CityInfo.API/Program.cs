@@ -43,6 +43,9 @@ public class Program
                 builder.Configuration["ConnectionStrings:DefaultConnection"]
                 );
         });
+        builder.Services.AddScoped<ICityInfoRepository, CityInfoRepository>();
+
+        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         WebApplication app = builder.Build();
 

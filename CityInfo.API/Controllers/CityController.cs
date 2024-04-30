@@ -1,4 +1,6 @@
-﻿using CityInfo.API.Models;
+﻿using AutoMapper;
+using CityInfo.API.Models;
+using CityInfo.API.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,27 +10,36 @@ namespace CityInfo.API.Controllers;
 [ApiController]
 public class CityController : ControllerBase
 {
-    private readonly CityDataStore _citiesDataStore;
+    private readonly ICityInfoRepository _cityInfoRepository;
+    private readonly IMapper _mapper;
 
-    public CityController(CityDataStore citiesDataStore)
+    public CityController(ICityInfoRepository cityInfoRepository, IMapper mapper)
     {
-        _citiesDataStore = citiesDataStore;
+        _cityInfoRepository = cityInfoRepository;
+        _mapper = mapper;
     }
+
     [HttpGet]
-    public ActionResult<IEnumerable<CityDto>> GetCities()
+    public async Task<ActionResult<IEnumerable<CityWithoutPointsOfInterestDto>>> GetCities()
     {
-        return Ok(_citiesDataStore.Cities);
+        var cityEntities = await _cityInfoRepository.GetCitiesAsync();
+
+        var results = _mapper.Map<IEnumerable<CityWithoutPointsOfInterestDto>>(cityEntities);
+
+        return Ok(results);
     }
 
     [HttpGet("{id:int}")]
-    public ActionResult<CityDto> GetCity(int id)
+    public async Task<IActionResult> GetCity(int id , bool inculdePointsOfInterest = false)
     {
-        var city = _citiesDataStore.Cities
-            .FirstOrDefault(c => c.Id == id);
+        var city = await _cityInfoRepository.GetCityAsync(id , inculdePointsOfInterest);
 
-        if(city is null)
+        if (city is null)
             return NotFound();
-        else
-            return Ok(city);
+
+        if (inculdePointsOfInterest)
+            return Ok(_mapper.Map<CityDto>(city));
+
+        return Ok(_mapper.Map<CityWithoutPointsOfInterestDto>(city));
     }
 }
