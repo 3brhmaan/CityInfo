@@ -94,4 +94,10 @@ public class CityInfoRepository : ICityInfoRepository
     {
         _context.PointsOfInterests.Remove(pointOfInterest);
     }
+
+    public async Task<bool> CityNameMatchCityId(string? cityName, int cityId)
+    {
+        return await _context.Cities
+            .AnyAsync(c => c.Id == cityId && c.Name == cityName);
+    }
 }

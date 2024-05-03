@@ -35,9 +35,13 @@ public class PointsOfInterestController : ControllerBase
     public async Task<ActionResult<IEnumerable<PointOfInterestDto>>> GetPointsOfInterest(
         int cityId)
     {
-        var flg = await _cityInfoRepository.CityExistsAsync(cityId);
+        var cityName = User.Claims
+            .FirstOrDefault(c => c.Type == "city")?.Value;
 
-        if (!flg)
+        if (!await _cityInfoRepository.CityNameMatchCityId(cityName, cityId))
+            return Forbid();
+
+        if (!await _cityInfoRepository.CityExistsAsync(cityId))
             return NotFound();
 
         var pointsOfInterestForCity = await _cityInfoRepository

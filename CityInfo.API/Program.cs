@@ -59,7 +59,7 @@ public class Program
                     ValidIssuer = builder.Configuration["Authentication:Issuer"],
 
                     ValidateAudience = true,
-                    ValidAudience = builder.Configuration["Authentication:Audience"],
+                    ValidAudience = builder.Configuration["Authentication:Audiance"],
 
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(
