@@ -11,7 +11,7 @@ namespace CityInfo.API.Controllers;
 
 [Route("api/Cities/{CityId}/PointsOfInterest")]
 [ApiController]
-[Authorize]
+[Authorize(Policy = "MustBeFromAntwerp")]
 public class PointsOfInterestController : ControllerBase
 {
     private readonly ILogger<PointsOfInterestController> _logger;
@@ -35,12 +35,6 @@ public class PointsOfInterestController : ControllerBase
     public async Task<ActionResult<IEnumerable<PointOfInterestDto>>> GetPointsOfInterest(
         int cityId)
     {
-        var cityName = User.Claims
-            .FirstOrDefault(c => c.Type == "city")?.Value;
-
-        if (!await _cityInfoRepository.CityNameMatchCityId(cityName, cityId))
-            return Forbid();
-
         if (!await _cityInfoRepository.CityExistsAsync(cityId))
             return NotFound();
 

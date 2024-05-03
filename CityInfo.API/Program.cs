@@ -67,6 +67,20 @@ public class Program
                 };
             });
 
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("MustBeFromAntwerp", policy =>
+            {
+                // user must be authenticated first
+                policy.RequireAuthenticatedUser();
+
+                // then the city claim must be Antwerp
+                policy.RequireClaim("city", "Antwerp");
+            });
+        });
+
+        // policy is made of set of requirements 
+        // when all requirements evaluate to true , the policy is met 
 
         WebApplication app = builder.Build();
 
