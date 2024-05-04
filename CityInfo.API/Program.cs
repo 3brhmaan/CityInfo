@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
+using Asp.Versioning;
 
 namespace CityInfo.API;
 
@@ -79,8 +80,13 @@ public class Program
             });
         });
 
-        // policy is made of set of requirements 
-        // when all requirements evaluate to true , the policy is met 
+        builder.Services.AddApiVersioning(setupAction =>
+        {
+            setupAction.ReportApiVersions = true;
+            setupAction.AssumeDefaultVersionWhenUnspecified = true;
+            setupAction.DefaultApiVersion = new ApiVersion(1, 0);
+        }).AddMvc();
+
 
         WebApplication app = builder.Build();
 
