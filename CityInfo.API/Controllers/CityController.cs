@@ -58,7 +58,11 @@ public class CityController : ControllerBase
     /// <param name="id">the Id of the City To Get</param>
     /// <param name="inculdePointsOfInterest">whether or not to include the points interest</param>
     /// <returns>A city with or without points of interest</returns>
+    /// <response code = "200">Returns the requested city</response>
     [HttpGet("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetCity(
         int id ,
         bool inculdePointsOfInterest = false)
