@@ -36,7 +36,13 @@ public class Program
         builder.Services.AddProblemDetails();
 
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(setupAction =>
+        {
+            var xmlCommentsFile = "CityInfo.API.xml";
+            var xmlCommentsFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
+
+            setupAction.IncludeXmlComments(xmlCommentsFullPath);
+        });
 
         builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
         builder.Services.AddTransient<IMailService , LocalMailService>();
